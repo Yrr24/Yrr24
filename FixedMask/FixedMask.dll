@@ -1,81 +1,48 @@
 using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
-using ModelReplacement;
 using UnityEngine;
 
-[assembly: CompilationRelaxations(8)]
-[assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
-[assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: AssemblyTitle("FixedMask")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FixedMask")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
-[assembly: AssemblyTrademark("")]
-[assembly: ComVisible(false)]
-[assembly: Guid("0c098703-6551-44c4-a5b0-1325e3ba2fbb")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName = ".NET Framework 4.7.2")]
-[assembly: AssemblyVersion("1.0.0.0")]
-
-namespace LCThiccMaskCombination
+[BepInPlugin("FxRbit.FixedMask", "Fixed Mask", "1.0.0.0")]
+public class ThiccMaskCombinationBase : BaseUnityPlugin
 {
-    [BepInPlugin("FxRbit.FixedMask", "Fixed Mask", "1.0.0.0")]
-    public class ThiccMaskCombinationBase : BaseUnityPlugin
+    private Harmony harmony;
+
+    public static ThiccMaskCombinationBase Instance;
+    public ManualLogSource Logger;
+
+    private void Awake()
     {
-        private const string modGUID = "FxRbit.FixedMask";
-        private const string modName = "Fixed Mask";
-        private const string modVersion = "1.0.0.0";
-        private readonly Harmony harmony = new Harmony("FxRbit.FixedMask");
+        Logger = Logger.CreateLogSource("FxRbit.FixedMask");
+        Instance = this;
+        harmony = new Harmony("FxRbit.FixedMask");
+        harmony.PatchAll();
+        Logger.LogInfo("Plugin Fixed Mask is loaded! >:3");
+    }
 
-        public static ThiccMaskCombinationBase Instance;
-        public ManualLogSource Logger;
-        public static SpawnableEnemyWithRarity maskedPrefab;
-        public static SpawnableEnemyWithRarity flowerPrefab;
-
-        private void Awake()
+    public static void ResetMaskModelReplacement(ref MaskedPlayerEnemy __instance)
+    {
+        // Check if ModelReplacementAPI is available
+        if (Type.GetType("ModelReplacementAPI") == null)
         {
-            Logger = Logger.CreateLogSource("FxRbit.FixedMask");
-            if ((Object)(object)Instance == (Object)null)
-            {
-                Instance = this;
-            }
-            harmony.PatchAll();
-            Logger.LogInfo((object)"Plugin Fixed Mask is loaded! >:3");
-            harmony.PatchAll(typeof(ThiccMaskCombinationBase));
+            // Handle the case where ModelReplacementAPI is not available
+            Console.WriteLine("ModelReplacementAPI is not available. Model replacement cannot be performed.");
+            return;
         }
 
-        public static void ResetMaskModelReplacement(ref MaskedPlayerEnemy __instance)
+        var bodyReplacement = __instance.gameObject.GetComponent<BodyReplacementBase>();
+        if (bodyReplacement != null)
         {
-            // Check if ModelReplacementAPI is available
-            if (Type.GetType("ModelReplacementAPI") == null)
-            {
-                // Handle the case where ModelReplacementAPI is not available
-                Console.WriteLine("ModelReplacementAPI is not available. Model replacement cannot be performed.");
-                return;
-            }
-
-            if (!((Object)(object)((Component)__instance).gameObject.GetComponent<BodyReplacementBase>() == (Object)null))
-            {
-                ModelReplacementAPI.Instance.Logger.LogInfo((object)("Reinstantiating model replacement for " + ((object)__instance)?.ToString() + " "));
-                Type type = ((object)((Component)__instance).gameObject.GetComponent<BodyReplacementBase>()).GetType();
-                Object.Destroy((Object)(object)((Component)__instance).gameObject.GetComponent<BodyReplacementBase>());
-                ((Component)__instance).gameObject.AddComponent(type);
-            }
+            ModelReplacementAPI.Instance.Logger.LogInfo($"Reinstantiating model replacement for {__instance.gameObject.name}");
+            Type type = bodyReplacement.GetType();
+            Object.Destroy(bodyReplacement);
+            __instance.gameObject.AddComponent(type);
         }
+    }
 
-        public static void SetMaskModelReplacement(ref MaskedPlayerEnemy __instance, Type type)
-        {
-            // Rest of the method...
-        }
+    public static void SetMaskModelReplacement(ref MaskedPlayerEnemy __instance, Type type)
+    {
+        // Rest of the method...
     }
 }

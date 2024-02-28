@@ -6,10 +6,9 @@ the texture/color when using mods that change the player model using ModelReplac
 enemies stick out like a sore thumb when playing with custom player models.
 
 
-SPAGHETTI CODE, I DON'T KNOW ANYTHING ABOUT C#, I AM TRYING TO REVERSE ENGINEER THESE MODS AND CODE!!
+WARNING!!!
 
-DOES NOT WORK YET!!
-CURRENTLY BEING TESTED!!!
+This Mod is in a trial period so it is not sure that it will work well yet.
 
 This mod fixes compatibility with MaskedEnemyOveraul and ModelReplacementAPI.
 
